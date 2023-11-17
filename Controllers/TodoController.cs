@@ -21,6 +21,7 @@ namespace MeuTodo.Controllers
             var todos = await context.Todos.AsNoTracking().ToListAsync();
             return Ok(todos);
         }
+
         [HttpGet]
         [Route("todos/{id}")]
         public async Task<IActionResult> GetByIdAsync([FromServices] AppDbContext context, [FromRoute] int id)
@@ -28,6 +29,7 @@ namespace MeuTodo.Controllers
             var todo = await context.Todos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             return todo == null ? NotFound() : Ok(todo);
         }
+
         [HttpPost("todos")]
         public async Task<IActionResult> PostAsync([FromServices] AppDbContext context, [FromBody] CreateTodoViewModel model)
         {
@@ -52,6 +54,7 @@ namespace MeuTodo.Controllers
                 return BadRequest();
             }
         }
+
         [HttpPut("todos/{id}")]
         public async Task<IActionResult> PutAsync(
             [FromServices] AppDbContext context,
@@ -80,6 +83,27 @@ namespace MeuTodo.Controllers
                 return Ok(todo);
             }
             catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpDelete]
+        [Route("todos/{id}")]
+        public async Task<IActionResult> DeleteAsync([FromServices] AppDbContext context, [FromRoute] int id)
+        {
+            var todo = await context
+            .Todos.AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+            try
+            {
+                context.Todos.Remove(todo);
+                await context.SaveChangesAsync();
+
+                return Ok();
+            }
+            catch (Exception e)
             {
                 return BadRequest();
             }
